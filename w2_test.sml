@@ -1,0 +1,62 @@
+use "w2.sml";
+
+exception AssertError;
+fun assert b = if b then () else raise AssertError;
+
+assert (ListIterable.emptyIterator = (ListIterable.makeIterator []));
+val itr = ListIterable.makeIterator [1, 2];
+assert (ListIterable.rEnd itr = false);
+assert (ListIterable.lEnd itr = false);
+assert (ListIterable.rEnd ListIterable.emptyIterator = true);
+assert (ListIterable.lEnd ListIterable.emptyIterator = true);
+assert (ListIterable.value itr = 1);
+val itr = ListIterable.prev itr;
+(ListIterable.prev itr; raise AssertError) handle ListIterable.IllegalOperation => ();
+(ListIterable.value itr; raise AssertError) handle ListIterable.IllegalOperation => ();
+assert (ListIterable.lEnd itr = true);
+val itr = ListIterable.next itr;
+val itr = ListIterable.next itr;
+assert (ListIterable.value itr = 2);
+val itr = ListIterable.next itr;
+(ListIterable.next itr; raise AssertError) handle ListIterable.IllegalOperation => ();
+(ListIterable.value itr; raise AssertError) handle ListIterable.IllegalOperation => ();
+assert (ListIterable.rEnd itr = true);
+
+val itr = SeqIterable.makeIterator (Cons("1", fn () => (Cons ("2", fn () => Nil))));
+assert (SeqIterable.rEnd itr = false);
+assert (SeqIterable.lEnd itr = false);
+assert (SeqIterable.rEnd SeqIterable.emptyIterator = true);
+assert (SeqIterable.lEnd SeqIterable.emptyIterator = true);
+assert (SeqIterable.value itr = "1");
+val itr = SeqIterable.prev itr;
+(SeqIterable.prev itr; raise AssertError) handle SeqIterable.IllegalOperation => ();
+(SeqIterable.value itr; raise AssertError) handle SeqIterable.IllegalOperation => ();
+assert (SeqIterable.lEnd itr = true);
+val itr = SeqIterable.next itr;
+val itr = SeqIterable.next itr;
+assert (SeqIterable.value itr = "2");
+val itr = SeqIterable.next itr;
+(SeqIterable.next itr; raise AssertError) handle SeqIterable.IllegalOperation => ();
+(SeqIterable.value itr; raise AssertError) handle SeqIterable.IllegalOperation => ();
+assert (SeqIterable.rEnd itr = true);
+
+structure Itr = MakeModIterator(ListIterable);
+assert (Itr.hasNext() = false);
+assert (Itr.hasPrev() = false);
+assert (Itr.init [1, 2] = ());
+assert (Itr.hasNext() = true);
+assert (Itr.hasPrev() = true);
+assert (Itr.value() = 1);
+assert (Itr.prev() = ());
+(Itr.prev(); raise AssertError) handle ListIterable.IllegalOperation => ();
+(Itr.value(); raise AssertError) handle ListIterable.IllegalOperation => ();
+assert (Itr.hasPrev() = false);
+assert (Itr.next() = ());
+assert (Itr.next() = ());
+assert (Itr.value() = 2);
+assert (Itr.next() = ());
+(Itr.next(); raise AssertError) handle ListIterable.IllegalOperation => ();
+(Itr.value(); raise AssertError) handle ListIterable.IllegalOperation => ();
+assert (Itr.hasNext() = false);
+
+assert (sumAll() = 45);
